@@ -9,12 +9,14 @@
 import Foundation
 import Parse
 import Bond
-
+import ConvenienceKit
 // 1
 class Post : PFObject, PFSubclassing {
     
     var image: Observable<UIImage?> = Observable(nil)
     var likes: Observable<[PFUser]?> = Observable(nil)
+    
+    static var imageCache: NSCacheSwift<String, UIImage>!
     
 //    var photoUploadTask: UIBackgroundTaskIdentifier?
     
@@ -41,6 +43,8 @@ class Post : PFObject, PFSubclassing {
             // inform Parse about this subclass
 //            self.registerSubclass()
 //        }
+        
+         Post.imageCache = NSCacheSwift<String, UIImage>()
     }
     
     func uploadPost() {
@@ -69,6 +73,10 @@ class Post : PFObject, PFSubclassing {
     }
     
     func downloadImage() {
+        
+        // 1
+        image.value = Post.imageCache[self.imageFile!.name]
+        
         // if image is not downloaded yet, get it
         // 1
         if (image.value == nil) {
@@ -78,6 +86,9 @@ class Post : PFObject, PFSubclassing {
                     let image = UIImage(data: data, scale:1.0)!
                     // 3
                     self.image.value = image
+                    
+                    // 2
+                    Post.imageCache[self.imageFile!.name] = image
                 }
             }
         }
