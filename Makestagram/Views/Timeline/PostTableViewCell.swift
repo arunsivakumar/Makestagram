@@ -33,7 +33,7 @@ class PostTableViewCell: UITableViewCell {
             if let post = post {
                 //2
                 // bind the image of the post to the 'postImage' view
-                post.image.bindTo(postImageView.bnd_image)
+                postDisposable = post.image.bindTo(postImageView.bnd_image)
                 
                 likeDisposable = post.likes.observe { (value: [PFUser]?) -> () in
                     // 3
